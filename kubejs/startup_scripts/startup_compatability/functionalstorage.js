@@ -137,7 +137,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
                 }
 
                 hasContents = true
-                totalAmount = Math.max(totalAmount, desired.getCount() * result.getNeeded())
+                totalAmount = Math.max(totalAmount, Math.min(2147483647, desired.getCount() * result.getNeeded()))
             }
 
             compactingAmountField.setInt(handler, totalAmount)
