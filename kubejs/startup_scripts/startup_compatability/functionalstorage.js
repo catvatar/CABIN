@@ -29,18 +29,22 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
             && typeof blockEntity.getStorage === "function"
     }
 
-    const createDrawerProxy = handler => {
-        let storedStacks = handler.getStoredStacks()
+    const createDrawerProxy = blockEntity => {
+        let getHandler = () => blockEntity.getStorage()
         let pending = []
+        let storedStacks = getHandler().getStoredStacks()
 
         for (let slot = 0; slot < storedStacks.size(); ++slot) {
-            pending[slot] = copyStack(handler.getStackInSlot(slot))
+            pending[slot] = copyStack(getHandler().getStackInSlot(slot))
         }
 
         let apply = () => {
-            for (let slot = 0; slot < storedStacks.size(); ++slot) {
+            let handler = getHandler()
+            let currentStacks = handler.getStoredStacks()
+
+            for (let slot = 0; slot < currentStacks.size(); ++slot) {
                 let desired = copyStack(pending[slot])
-                let bigStack = storedStacks.get(slot)
+                let bigStack = currentStacks.get(slot)
 
                 if (desired.empty) {
                     if (!handler.isLocked()) {
@@ -59,25 +63,25 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
 
         return new JavaAdapter(IItemHandlerModifiable, {
             getSlots() {
-                return handler.getSlots()
+                return getHandler().getSlots()
             },
             getStackInSlot(slot) {
-                return slot >= 0 && slot < storedStacks.size() ? copyStack(pending[slot]) : handler.getStackInSlot(slot)
+                return slot >= 0 && slot < pending.length ? copyStack(pending[slot]) : getHandler().getStackInSlot(slot)
             },
             insertItem(slot, stack, simulate) {
-                return handler.insertItem(slot, stack, simulate)
+                return getHandler().insertItem(slot, stack, simulate)
             },
             extractItem(slot, amount, simulate) {
-                return handler.extractItem(slot, amount, simulate)
+                return getHandler().extractItem(slot, amount, simulate)
             },
             getSlotLimit(slot) {
-                return handler.getSlotLimit(slot)
+                return getHandler().getSlotLimit(slot)
             },
             isItemValid(slot, stack) {
-                return handler.isItemValid(slot, stack)
+                return getHandler().isItemValid(slot, stack)
             },
             setStackInSlot(slot, stack) {
-                if (slot >= 0 && slot < storedStacks.size()) {
+                if (slot >= 0 && slot < pending.length) {
                     pending[slot] = copyStack(stack)
                     apply()
                 }
@@ -86,11 +90,11 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
     }
 
     const createCompactingProxy = blockEntity => {
-        let handler = blockEntity.getStorage()
+        let getHandler = () => blockEntity.getStorage()
         let pending = []
 
-        for (let slot = 0; slot < handler.getResultList().size(); ++slot) {
-            pending[slot] = copyStack(handler.getStackInSlot(slot))
+        for (let slot = 0; slot < getHandler().getResultList().size(); ++slot) {
+            pending[slot] = copyStack(getHandler().getStackInSlot(slot))
         }
 
         let ensureSetup = (slot, stack) => {
@@ -98,6 +102,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
                 return
             }
 
+            let handler = getHandler()
             let results = handler.getResultList()
             if (slot < results.size()) {
                 let result = results.get(slot)
@@ -115,6 +120,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
         }
 
         let apply = () => {
+            let handler = getHandler()
             let totalAmount = 0
             let hasContents = false
 
@@ -143,22 +149,22 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
 
         return new JavaAdapter(IItemHandlerModifiable, {
             getSlots() {
-                return handler.getSlots()
+                return getHandler().getSlots()
             },
             getStackInSlot(slot) {
-                return slot >= 0 && slot < pending.length ? copyStack(pending[slot]) : handler.getStackInSlot(slot)
+                return slot >= 0 && slot < pending.length ? copyStack(pending[slot]) : getHandler().getStackInSlot(slot)
             },
             insertItem(slot, stack, simulate) {
-                return handler.insertItem(slot, stack, simulate)
+                return getHandler().insertItem(slot, stack, simulate)
             },
             extractItem(slot, amount, simulate) {
-                return handler.extractItem(slot, amount, simulate)
+                return getHandler().extractItem(slot, amount, simulate)
             },
             getSlotLimit(slot) {
-                return handler.getSlotLimit(slot)
+                return getHandler().getSlotLimit(slot)
             },
             isItemValid(slot, stack) {
-                return handler.isItemValid(slot, stack)
+                return getHandler().isItemValid(slot, stack)
             },
             setStackInSlot(slot, stack) {
                 if (slot >= 0 && slot < pending.length) {
@@ -179,7 +185,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
         let mountedStorage = null
 
         if (storage instanceof BigInventoryHandler) {
-            mountedStorage = createDrawerProxy(storage)
+            mountedStorage = createDrawerProxy(blockEntity)
         } else if (storage instanceof CompactingInventoryHandler) {
             mountedStorage = createCompactingProxy(blockEntity)
         }
