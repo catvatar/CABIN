@@ -289,6 +289,8 @@ ServerEvents.tags("block", event => {
 
     event.get("create:simple_mounted_storage")
         .add(/^farmersdelight:.*_cabinet$|^everycomp:fd.*_cabinet$/)
+        .add(/^functionalstorage:((acacia|birch|cherry|crimson|dark_oak|jungle|mangrove|oak|spruce|warped)_[124]|framed_[124]|ender_drawer|compacting_drawer|simple_compacting_drawer|compacting_framed_drawer|framed_simple_compacting_drawer)$/)
+        .add(/^everycomp:fs.*_[124]$/)
         // AE2 Sky stone chests (These don't work with the create:chest_mounted_storage tag for some reason so they are here instead)
         .add("ae2:sky_stone_chest")
         .add("ae2:smooth_sky_stone_chest")
