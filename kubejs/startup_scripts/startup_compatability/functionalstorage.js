@@ -7,6 +7,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
     const CompactingInventoryHandler = Java.loadClass("com.buuz135.functionalstorage.inventory.CompactingInventoryHandler")
     const CompactingUtil = Java.loadClass("com.buuz135.functionalstorage.util.CompactingUtil")
 
+    const MAX_INT = 2147483647
     const compactingAmountField = CompactingInventoryHandler.__javaObject__.getDeclaredField("amount")
     compactingAmountField.setAccessible(true)
 
@@ -137,7 +138,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
                 }
 
                 hasContents = true
-                totalAmount = Math.max(totalAmount, Math.min(2147483647, desired.getCount() * result.getNeeded()))
+                totalAmount = Math.max(totalAmount, Math.min(MAX_INT, desired.getCount() * result.getNeeded()))
             }
 
             compactingAmountField.setInt(handler, totalAmount)
