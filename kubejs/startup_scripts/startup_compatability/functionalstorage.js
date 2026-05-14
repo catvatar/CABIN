@@ -33,12 +33,12 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
         let storedStacks = handler.getStoredStacks()
         let pending = []
 
-        for (let slot = 0;slot < storedStacks.size();++slot) {
+        for (let slot = 0; slot < storedStacks.size(); ++slot) {
             pending[slot] = copyStack(handler.getStackInSlot(slot))
         }
 
         let apply = () => {
-            for (let slot = 0;slot < storedStacks.size();++slot) {
+            for (let slot = 0; slot < storedStacks.size(); ++slot) {
                 let desired = copyStack(pending[slot])
                 let bigStack = storedStacks.get(slot)
 
@@ -89,7 +89,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
         let handler = blockEntity.getStorage()
         let pending = []
 
-        for (let slot = 0;slot < handler.getResultList().size();++slot) {
+        for (let slot = 0; slot < handler.getResultList().size(); ++slot) {
             pending[slot] = copyStack(handler.getStackInSlot(slot))
         }
 
@@ -118,7 +118,7 @@ if (Platform.isLoaded("create") && Platform.isLoaded("functionalstorage")) {
             let totalAmount = 0
             let hasContents = false
 
-            for (let slot = 0;slot < pending.length;++slot) {
+            for (let slot = 0; slot < pending.length; ++slot) {
                 let desired = copyStack(pending[slot])
                 if (desired.empty) {
                     continue
